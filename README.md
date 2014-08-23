@@ -5,18 +5,17 @@ A simple vagrant-based Test-Environment of a 4-node-Cassandra-Cluster.
 
 #Fetching Ressources
 
-First of all, we need a JDK (here: JDK 8) and Apache Cassandra. With
+First of all, we need a JDK (here: JDK 8) and Apache Cassandra. To fetch the ressources and persist them use:
 ```
 ./bin/fetchRessources.sh
 ```
-the packages will be fetched and saved in the repository directory.
 
 #Startup
 To initialize the vagrant boxes and startup the cassandra cluster:
 ```
 cd cassandra
 vagrant up
-``
+```
 This will fetch the Ubuntu 14.04. image if not exist, start all nodes (node 1-4) and install them with all neccessary stuff.
 
 The single boxes are named node1, node2, node3 and finally node4.
