@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-while getopts ":i:" opt; do
+while getopts ":i:d:" opt; do
   case $opt in
     i)
       IP_ADDRESS=$OPTARG
+      ;;
+    d)
+      DATACENTER=$OPTARG
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -12,8 +15,13 @@ while getopts ":i:" opt; do
 done
 
 if [ -z ${IP_ADDRESS} ] ; then
-  echo "IP address not set!"
+  echo "IP address is not set!"
 fi
+
+if [ -z ${DATACENTER} ] ; then
+  echo "Datacenter name is not set!"
+fi
+
 
 REPOSITORY_DIR="/var/repository"
 JDK_PKG="jdk-8u20-linux-x64.tar.gz"
@@ -49,6 +57,7 @@ if [ ! -e /opt/apache-cassandra-2.0.9 ] ; then
   sudo sed -i.bak -e "s/\${ip_addr}/${IP_ADDRESS}/g" /opt/cassandra/conf/cassandra.yaml
 
   sudo cp /var/repository/cassandra-rackdc.properties /opt/cassandra/conf/
+  sudo sed -i.bak -e "s/\${datacenter}/${DATACENTER}/g" /opt/cassandra/conf/cassandra-rackdc.properties
 
   if id -u cassandra >/dev/null 2>&1; then
     echo "user exists"
