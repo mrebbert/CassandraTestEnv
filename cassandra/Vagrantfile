@@ -1,0 +1,33 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+boxes = [
+  { :name => :node1,:ip => '192.168.2.110',:ssh_port => 2211,:cpus => 1, :mem => 512 },
+  { :name => :node2,:ip => '192.168.2.120',:ssh_port => 2212,:cpus => 1, :mem => 512 },
+  { :name => :node3,:ip => '192.168.2.130',:ssh_port => 2213,:cpus => 1, :mem => 512 },
+  { :name => :node4,:ip => '192.168.2.140',:ssh_port => 2214,:cpus => 1, :mem => 512 },
+  ]
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  boxes.each do |opts|
+    config.vm.define opts[:name] do |config|
+      config.vm.box       = "ubuntu/trusty64"
+      config.vm.network  "private_network", ip: opts[:ip]
+      config.vm.network  "forwarded_port", guest: 22, host: opts[:ssh_port]
+      config.vm.hostname = "%s.vagrant" % opts[:name].to_s
+      config.vm.synced_folder "../repository", "/var/repository" 
+      config.ssh.forward_agent = true
+      config.vm.provider "virtualbox" do |vb|
+        # Use VBoxManage to customize the VM
+        vb.customize ["modifyvm", :id, "--cpus", opts[:cpus] ] if opts[:cpus]
+        vb.customize ["modifyvm", :id, "--memory", opts[:mem] ] if opts[:mem]
+      end
+      config.vm.provision "shell" do |s|
+        s.path= "../repository/bootstrap.sh"
+        s.args= ["-i", opts[:ip]]
+      end
+    end
+  end
+end
