@@ -70,8 +70,8 @@ if [ ! -e /opt/apache-cassandra-2.0.9 ] ; then
   sudo cp /var/repository/cassandra.sh /etc/profile.d/
   
   . /etc/profile
-
-  sudo /etc/init.d/cassandra restart
+  sudo update-rc.d cassandra defaults
+  sudo service cassandra restart
 fi
 
 exit 0
