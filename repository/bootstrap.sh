@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#IP_ADDRESS=${ip_addr}
-
 while getopts ":i:" opt; do
   case $opt in
     i)
@@ -20,12 +18,6 @@ fi
 REPOSITORY_DIR="/var/repository"
 JDK_PKG="jdk-8u20-linux-x64.tar.gz"
 CASSANDRA_PKG="apache-cassandra-2.0.9-bin.tar.gz"
-JSVC_PKG="commons-daemon-1.0.15-bin.tar"
-
-#if [ ! -e /usr/bin/jsvc ] ; then
-#  sudo apt-get update
-#  sudo apt-get install -y jsvc
-#fi
 
 if [ ! -e /opt/java  ] ; then
   sudo tar xvfz ${REPOSITORY_DIR}/${JDK_PKG} -C /opt/
