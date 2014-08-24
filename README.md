@@ -1,4 +1,4 @@
-CassandraTestEnv
+Cassandra-Test-Environment
 ================
 
 A simple vagrant-based Test-Environment of a 4-node-Cassandra-Cluster and a separate box for the Datastax OpsCenter.
