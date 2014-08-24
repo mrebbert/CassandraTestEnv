@@ -27,7 +27,14 @@ REPOSITORY_DIR="/var/repository"
 JDK_PKG="jdk-8u20-linux-x64.tar.gz"
 CASSANDRA_PKG="apache-cassandra-2.0.9-bin.tar.gz"
 
+
 if [ ! -e /opt/java  ] ; then
+
+  if [ ! -e ${REPOSITORY_DIR}/${JDK_PKG} ] ; then
+    echo "Please fetch the JDK-Package first. You can use the fetchRessource-Script in the bin directory."
+    exit 1
+  fi
+  
   sudo tar xvfz ${REPOSITORY_DIR}/${JDK_PKG} -C /opt/
   sudo ln -s /opt/jdk1.8.0_20 /opt/java
   sudo chown -R root. /opt/jdk1.8.0_20
@@ -44,6 +51,10 @@ if [ ! -e /opt/java  ] ; then
 fi
 
 if [ ! -e /opt/apache-cassandra-2.0.9 ] ; then
+  if [ ! -e ${REPOSITORY_DIR}/${CASSANDRA_PKG} ] ; then
+    echo "Please fetch the Cassandra-Package first. You can use the fetchRessource-Script in the bin directory."
+    exit 1
+  fi
   sudo tar xvfz ${REPOSITORY_DIR}/${CASSANDRA_PKG} -C /opt/
   sudo ln -s /opt/apache-cassandra-2.0.9 /opt/cassandra
 
