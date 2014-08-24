@@ -16,17 +16,31 @@ done
 
 if [ -z ${IP_ADDRESS} ] ; then
   echo "IP address is not set!"
+  exit 1
 fi
-
-if [ -z ${DATACENTER} ] ; then
-  echo "Datacenter name is not set!"
-fi
-
 
 REPOSITORY_DIR="/var/repository"
 JDK_PKG="jdk-8u20-linux-x64.tar.gz"
 CASSANDRA_PKG="apache-cassandra-2.0.9-bin.tar.gz"
 
+sudo sed -i 's/^mesg n$/tty -s \&\& mesg n/g' /root/.profile
+
+if [ "$HOSTNAME" = "ops" ] ; then
+  if [ ! -e /etc/init.d/opscenterd ] ; then
+    echo "deb http://debian.datastax.com/community stable main" | \
+        sudo tee -a /etc/apt/sources.list.d/datastax.community.list
+    curl -L http://debian.datastax.com/debian/repo_key | sudo apt-key add -
+    sudo apt-get update
+    sudo apt-get install -y opscenter
+    sudo service opscenterd start
+  fi
+  exit 0
+fi
+
+if [ -z ${DATACENTER} ] ; then
+  echo "Datacenter name is not set!"
+  exit 1
+fi
 
 if [ ! -e /opt/java  ] ; then
 

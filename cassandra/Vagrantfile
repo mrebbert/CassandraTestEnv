@@ -2,6 +2,7 @@
 # vi: set ft=ruby :
 
 boxes = [
+  { :name => :ops,:ip => '192.168.2.100',:ssh_port => 2210,:cpus => 1, :mem => 256 },
   { :name => :node1,:ip => '192.168.2.110',:datacenter => '1stDC',:ssh_port => 2211,:cpus => 1, :mem => 512 },
   { :name => :node2,:ip => '192.168.2.120',:datacenter => '2ndDC',:ssh_port => 2212,:cpus => 1, :mem => 512 },
   { :name => :node3,:ip => '192.168.2.130',:datacenter => '1stDC',:ssh_port => 2213,:cpus => 1, :mem => 512 },
@@ -16,6 +17,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.box       = "ubuntu/trusty64"
       config.vm.network  "private_network", ip: opts[:ip]
       config.vm.network  "forwarded_port", guest: 22, host: opts[:ssh_port]
+      if opts[:name].to_s == "ops"
+        config.vm.network  "forwarded_port", guest: 8888, host: 8888
+      end
       config.vm.hostname = "%s.vagrant" % opts[:name].to_s
       config.vm.synced_folder "../repository", "/var/repository" 
       config.ssh.forward_agent = true
@@ -26,7 +30,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
       config.vm.provision "shell" do |s|
         s.path= "../repository/bootstrap.sh"
-        s.args= ["-i", opts[:ip], "-d", opts[:datacenter]]
+        if opts[:name].to_s == "ops"
+          s.args= ["-i", opts[:ip]]
+        else 
+          s.args= ["-i", opts[:ip], "-d", opts[:datacenter]]
+        end
       end
     end
   end
