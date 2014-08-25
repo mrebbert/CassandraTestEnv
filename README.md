@@ -3,12 +3,15 @@ Cassandra-Test-Environment
 
 A simple vagrant-based Test-Environment of a 4-node-Cassandra-Cluster and a separate box for the Datastax OpsCenter.
 
-#Fetching Ressources
+#Optional: Fetching Ressources
 
-First of all, we need a JDK (here: JDK 8) and Apache Cassandra. To fetch the ressources and persist them use:
+First of all, we need a JDK (here: JDK 8) and Apache Cassandra. To fetch the ressources and persist them manually, use:
 ```
 ./bin/fetchRessources.sh
 ```
+The ressource file will be saved in the repository. 
+
+This step is now optional. The Cassandra- and JDK-Packages will be fetched with the first vagrant provisioning (see next section).
 
 #Startup
 To initialize the vagrant boxes and startup the cassandra cluster:
