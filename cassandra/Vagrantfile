@@ -3,10 +3,10 @@
 
 boxes = [
   { :name => :ops,:ip => '192.168.2.100',:ssh_port => 2210,:cpus => 1, :mem => 256 },
-  { :name => :node1,:ip => '192.168.2.110',:datacenter => '1stDC',:ssh_port => 2211,:cpus => 1, :mem => 512 },
-  { :name => :node2,:ip => '192.168.2.120',:datacenter => '2ndDC',:ssh_port => 2212,:cpus => 1, :mem => 512 },
-  { :name => :node3,:ip => '192.168.2.130',:datacenter => '1stDC',:ssh_port => 2213,:cpus => 1, :mem => 512 },
-  { :name => :node4,:ip => '192.168.2.140',:datacenter => '2ndDC',:ssh_port => 2214,:cpus => 1, :mem => 512 },
+  { :name => :node1,:ip => '192.168.2.110',:datacenter => '1stDC',:ssh_port => 2211,:cpus => 1, :mem => 1024 },
+  { :name => :node2,:ip => '192.168.2.120',:datacenter => '2ndDC',:ssh_port => 2212,:cpus => 1, :mem => 1024 },
+  { :name => :node3,:ip => '192.168.2.130',:datacenter => '1stDC',:ssh_port => 2213,:cpus => 1, :mem => 1024 },
+  { :name => :node4,:ip => '192.168.2.140',:datacenter => '2ndDC',:ssh_port => 2214,:cpus => 1, :mem => 1024 },
   ]
 
 VAGRANTFILE_API_VERSION = "2"
