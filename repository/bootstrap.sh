@@ -41,7 +41,6 @@ if [ ! -e /opt/java  ] ; then
 
   if [ ! -e ${REPOSITORY_DIR}/${JDK_PKG} ] ; then
     getJava
-    exit 1
   fi
   initJava  
 fi
@@ -49,7 +48,6 @@ fi
 if [ ! -e /opt/cassandra ] ; then
   if [ ! -e ${REPOSITORY_DIR}/${CASSANDRA_PKG} ] ; then
     getCassandra  
-    exit 1
   fi
   initCassandra
 fi
