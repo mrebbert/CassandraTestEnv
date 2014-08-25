@@ -1,39 +1,21 @@
 #! /bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+REPOSITORY_DIR=$DIR/../repository
 
-CASSANDRA_PKG=apache-cassandra-2.0.9-bin.tar.gz
-JDK_PKG=jdk-8u20-linux-x64.tar.gz
-OPSCENTER_PKG=opscenter.tar.gz
+. $DIR/../repository/functions.sh
 
-CASSANDRA_URL=http://mirrors.koehn.com/apache/cassandra/2.0.9/${CASSANDRA_PKG}
-JDK_URL=http://download.oracle.com/otn-pub/java/jdk/8u20-b26/${JDK_PKG}
-#OPSCENTER_URL="http://downloads.datastax.com/community/${OPSCENTER_PKG}"
-
-CURL=`which curl`
-
-if [ -z ${CURL} ] ; then
-  echo "Please install curl and put it in your PATH."
-  exit 3
-fi
-cd $DIR/../repository
+cd $REPOSITORY_DIR
 
 if [ ! -e ${CASSANDRA_PKG} ]; then
-  ${CURL} -O ${CASSANDRA_URL}
+ getCassandra 
 else 
   echo "Cassandra package already exists."    
 fi
 
 if [ ! -e ${JDK_PKG} ]; then
-  ${CURL} -b oraclelicense=accept-securebackup-cookie -O -L ${JDK_URL}
+  getJava
 else
   echo "JDK package already exists."    
 fi
-
-#if [ ! -e ${OPSCENTER_PKG} ]; then
-#  ${CURL} -O -L ${OPSCENTER_URL}
-#else 
-#  echo "Opscenter package already exists."    
-#fi
 
 exit 0
