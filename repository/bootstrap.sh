@@ -14,7 +14,12 @@ while getopts ":i:d:" opt; do
   esac
 done
 
+function usage {
+  echo "${0} -i <ip address> [-d <datacenter if its a cas* node>]"
+}
+
 if [ -z ${IP_ADDRESS} ] ; then
+  usage
   echo "IP address is not set!"
   exit 1
 fi
@@ -33,11 +38,12 @@ if [ "$HOSTNAME" = "ops" ] ; then
 fi
 
 if [ -z ${DATACENTER} ] ; then
+  usage
   echo "Datacenter name is not set!"
   exit 1
 fi
 
-if [ ! -e /opt/java  ] ; then
+if [ ! -e ${JAVA_HOME} ] ; then
 
   if [ ! -e ${REPOSITORY_DIR}/${JDK_PKG} ] ; then
     getJava
@@ -45,7 +51,7 @@ if [ ! -e /opt/java  ] ; then
   initJava  
 fi
 
-if [ ! -e /opt/cassandra ] ; then
+if [ ! -e ${CASSANDRA_HOME} ] ; then
   if [ ! -e ${REPOSITORY_DIR}/${CASSANDRA_PKG} ] ; then
     getCassandra  
   fi

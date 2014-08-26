@@ -2,10 +2,16 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-CASSANDRA_PKG=apache-cassandra-2.0.9-bin.tar.gz
-JDK_PKG=jdk-8u20-linux-x64.tar.gz
+CASSANDRA_USER="cassandra"
+CASSANDRA_HOME="/opt/cassandra"
+CASSANDRA_DATA_DIR="/var/lib/cassandra"
+CASSANDRA_LOG_DIR="/var/log/cassandra"
+CASSANDRA_VERSION="2.0.9"
+CASSANDRA_PKG=apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz
+CASSANDRA_URL=http://mirrors.koehn.com/apache/cassandra/${CASSANDRA_VERSION}/${CASSANDRA_PKG}
 
-CASSANDRA_URL=http://mirrors.koehn.com/apache/cassandra/2.0.9/${CASSANDRA_PKG}
+JAVA_HOME="/opt/java"
+JDK_PKG=jdk-8u20-linux-x64.tar.gz
 JDK_URL=http://download.oracle.com/otn-pub/java/jdk/8u20-b26/${JDK_PKG}
 
 CURL=`which curl`
@@ -38,23 +44,23 @@ function getCassandra {
 
 function initJava {
   sudo tar xvfz ${REPOSITORY_DIR}/${JDK_PKG} -C /opt/
-  sudo ln -s /opt/jdk1.8.0_20 /opt/java
+  sudo ln -s /opt/jdk1.8.0_20 ${JAVA_HOME}
   sudo chown -R root. /opt/jdk1.8.0_20
   sudo cp ${REPOSITORY_DIR}/java.sh /etc/profile.d/
 
-  sudo update-alternatives --install "/usr/bin/java" "java" "/opt/java/bin/java" 1
-  sudo update-alternatives --install "/usr/bin/javac" "javac" "/opt/java/bin/javac" 1
-  sudo update-alternatives --install "/usr/bin/javaws" "javaws" "/opt/java/bin/javaws" 1
-  sudo update-alternatives --set java /opt/java/bin/java
-  sudo update-alternatives --set javac /opt/java/bin/javac
-  sudo update-alternatives --set javaws /opt/java/bin/javaws
+  sudo update-alternatives --install "/usr/bin/java" "java" "${JAVA_HOME}/bin/java" 1
+  sudo update-alternatives --install "/usr/bin/javac" "javac" "${JAVA_HOME}/bin/javac" 1
+  sudo update-alternatives --install "/usr/bin/javaws" "javaws" "${JAVA_HOME}/bin/javaws" 1
+  sudo update-alternatives --set java ${JAVA_HOME}/bin/java
+  sudo update-alternatives --set javac ${JAVA_HOME}/bin/javac
+  sudo update-alternatives --set javaws ${JAVA_HOME}/bin/javaws
 
   . /etc/profile
 }
 
 function initCassandra {
   sudo tar xvfz ${REPOSITORY_DIR}/${CASSANDRA_PKG} -C /opt/
-  sudo ln -s /opt/apache-cassandra-2.0.9 /opt/cassandra
+  sudo ln -s /opt/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
   if [ ! -e /etc/init.d/cassandra ] ; then
     sudo cp ${REPOSITORY_DIR}/init-cassandra /etc/init.d/cassandra
@@ -62,29 +68,29 @@ function initCassandra {
     sudo chmod +x /etc/init.d/cassandra
   fi
 
-  sudo cp ${REPOSITORY_DIR}/cassandra.yaml /opt/cassandra/conf/
-  sudo sed -i.bak -e "s/\${ip_addr}/${IP_ADDRESS}/g" /opt/cassandra/conf/cassandra.yaml
+  sudo cp ${REPOSITORY_DIR}/cassandra.yaml ${CASSANDRA_HOME}/conf/
+  sudo sed -i.bak -e "s/\${ip_addr}/${IP_ADDRESS}/g" ${CASSANDRA_HOME}/conf/cassandra.yaml
 
-  sudo cp ${REPOSITORY_DIR}/cassandra-rackdc.properties /opt/cassandra/conf/
+  sudo cp ${REPOSITORY_DIR}/cassandra-rackdc.properties ${CASSANDRA_HOME}/conf/
   sudo sed -i.bak -e "s/\${datacenter}/${DATACENTER}/g" \
-    /opt/cassandra/conf/cassandra-rackdc.properties
+    ${CASSANDRA_HOME}/conf/cassandra-rackdc.properties
 
-  if id -u cassandra >/dev/null 2>&1; then
-    echo "user exists"
+  if id -u ${CASSANDRA_USER} >/dev/null 2>&1; then
+    echo "User ${CASSANDRA_USER} already exists."
   else
-    sudo useradd -d /opt/cassandra cassandra
+    sudo useradd -d ${CASSANDRA_HOME} ${CASSANDRA_USER}
   fi
-  sudo chown -R cassandra. /opt/cassandra
-  sudo chown -R cassandra. /opt/apache-cassandra-2.0.9
+  sudo chown -R ${CASSANDRA_USER}. ${CASSANDRA_HOME} 
+  sudo chown -R ${CASSANDRA_USER}. /opt/apache-cassandra-${CASSANDRA_VERSION}
 
-  if [ ! -e /var/lib/cassandra ] ; then
-    sudo mkdir /var/lib/cassandra
-    sudo chown cassandra. /var/lib/cassandra
+  if [ ! -e ${CASSANDRA_DATA_DIR} ] ; then
+    sudo mkdir ${CASSANDRA_DATA_DIR}
+    sudo chown ${CASSANDRA_USER}. ${CASSANDRA_DATA_DIR}
   fi
 
-  if [ ! -e /var/log/cassandra ] ; then
-    sudo mkdir /var/log/cassandra
-    sudo chown cassandra. /var/log/cassandra
+  if [ ! -e ${CASSANDRA_LOG_DIR} ] ; then
+    sudo mkdir ${CASSANDRA_LOG_DIR}
+    sudo chown ${CASSANDRA_USER}. ${CASSANDRA_LOG_DIR}
   fi
   sudo cp ${REPOSITORY_DIR}/cassandra.sh /etc/profile.d/
 
