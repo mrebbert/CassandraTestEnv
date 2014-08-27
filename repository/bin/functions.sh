@@ -33,45 +33,54 @@ function createPackageDir {
 }
 
 function initOpsCenter {
-  echo "deb http://debian.datastax.com/community stable main" | \
-    sudo tee -a /etc/apt/sources.list.d/datastax.community.list
-  curl -L http://debian.datastax.com/debian/repo_key | sudo apt-key add -
-  sudo apt-get update
-  sudo apt-get install -y opscenter
-  sudo service opscenterd start
+  echo -n "Installing Datastax-OpsCenter ..."
+  echo "deb http://debian.datastax.com/community stable main" >> \
+    /etc/apt/sources.list.d/datastax.community.list
+  curl --silent -L http://debian.datastax.com/debian/repo_key | sudo apt-key add - >/dev/null 2>&1
+  sudo apt-get -qq update >/dev/null 2>&1
+  sudo apt-get install -qq -y opscenter >/dev/null 2>&1
+  sudo service opscenterd start >/dev/null 2>&1
+  echo " done."
 }
 
 function getJava {
   checkCurl
-  ${CURL} -o ${PKG_DIR}/${JDK_PKG} -b oraclelicense=accept-securebackup-cookie -O -L ${JDK_URL}
+  echo -n "Fetching JDK package ..."
+  ${CURL} --silent -o ${PKG_DIR}/${JDK_PKG} -b oraclelicense=accept-securebackup-cookie -O -L ${JDK_URL} >/dev/null 2>&1
+  echo " done."
 }
 
 function getCassandra {
   checkCurl
-  ${CURL} -o ${PKG_DIR}/${CASSANDRA_PKG} ${CASSANDRA_URL}
+  echo -n "Fetching Cassandra package ..."
+  ${CURL} --silent -o ${PKG_DIR}/${CASSANDRA_PKG} ${CASSANDRA_URL} >/dev/null 2>&1
+  echo " done."
 }
 
 function initJava {
-  sudo tar xfz ${REPOSITORY_DIR}/pkg/${JDK_PKG} -C /opt/
+  echo -n "Installing JDK ..."
+  sudo tar xfz ${REPOSITORY_DIR}/pkg/${JDK_PKG} -C /opt/ >/dev/null 2>&1
   sudo ln -s /opt/jdk1.8.0_20 ${JAVA_HOME}
   sudo chown -R root. /opt/jdk1.8.0_20
   sudo cp ${JDK_MODULE_DIR}/java.sh /etc/profile.d/
 
   sudo update-alternatives --install "/usr/bin/java" "java" \
-      "${JAVA_HOME}/bin/java" 1 >/dev/null
+      "${JAVA_HOME}/bin/java" 1 >/dev/null 2>&1
   sudo update-alternatives --install "/usr/bin/javac" "javac" \
-      "${JAVA_HOME}/bin/javac" 1 >/dev/null 
+      "${JAVA_HOME}/bin/javac" 1 >/dev/null 2>&1
   sudo update-alternatives --install "/usr/bin/javaws" "javaws" \
-      "${JAVA_HOME}/bin/javaws" 1 >/dev/null
-  sudo update-alternatives --set java ${JAVA_HOME}/bin/java >/dev/null
-  sudo update-alternatives --set javac ${JAVA_HOME}/bin/javac >/dev/null
-  sudo update-alternatives --set javaws ${JAVA_HOME}/bin/javaws >/dev/null
+      "${JAVA_HOME}/bin/javaws" 1 >/dev/null 2>&1
+  sudo update-alternatives --set java ${JAVA_HOME}/bin/java >/dev/null 2>&1
+  sudo update-alternatives --set javac ${JAVA_HOME}/bin/javac >/dev/null 2>&1
+  sudo update-alternatives --set javaws ${JAVA_HOME}/bin/javaws >/dev/null 2>&1
 
   . /etc/profile
+  echo " done."
 }
 
 function initCassandra {
-  sudo tar xfz ${REPOSITORY_DIR}/pkg/${CASSANDRA_PKG} -C /opt/
+  echo -n "Installing Cassandra ..."
+  sudo tar xfz ${REPOSITORY_DIR}/pkg/${CASSANDRA_PKG} -C /opt/ >/dev/null 2>&1
   sudo ln -s /opt/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
   if [ ! -e /etc/init.d/cassandra ] ; then
@@ -90,7 +99,7 @@ function initCassandra {
   if id -u ${CASSANDRA_USER} >/dev/null 2>&1; then
     echo "User ${CASSANDRA_USER} already exists."
   else
-    sudo useradd -d ${CASSANDRA_HOME} ${CASSANDRA_USER}
+    sudo useradd -d ${CASSANDRA_HOME} ${CASSANDRA_USER} >/dev/null 2>&1
   fi
   sudo chown -R ${CASSANDRA_USER}. ${CASSANDRA_HOME} 
   sudo chown -R ${CASSANDRA_USER}. /opt/apache-cassandra-${CASSANDRA_VERSION}
@@ -107,6 +116,7 @@ function initCassandra {
   sudo cp ${CASSANDRA_MODULE_DIR}/cassandra.sh /etc/profile.d/
 
   . /etc/profile
-  sudo update-rc.d cassandra defaults >/dev/null
-  sudo service cassandra restart >/dev/null
+  sudo update-rc.d cassandra defaults >/dev/null 2>&1
+  sudo service cassandra restart >/dev/null 2>&1
+  echo " done."
 }
