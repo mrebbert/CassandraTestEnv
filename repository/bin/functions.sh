@@ -27,7 +27,7 @@ function checkCurl {
 }
 
 function createPackageDir {
-  if [ -e ${PKG_DIR} ] ; then
+  if [ ! -e ${PKG_DIR} ] ; then
     mkdir -p ${PKG_DIR}
   fi
 }
@@ -46,6 +46,7 @@ function initOpsCenter {
 function getJava {
   checkCurl
   echo -n "Fetching JDK package ..."
+  createPackageDir
   ${CURL} --silent -o ${PKG_DIR}/${JDK_PKG} -b oraclelicense=accept-securebackup-cookie -O -L ${JDK_URL} >/dev/null 2>&1
   echo " done."
 }
@@ -53,6 +54,7 @@ function getJava {
 function getCassandra {
   checkCurl
   echo -n "Fetching Cassandra package ..."
+  createPackageDir
   ${CURL} --silent -o ${PKG_DIR}/${CASSANDRA_PKG} ${CASSANDRA_URL} >/dev/null 2>&1
   echo " done."
 }
