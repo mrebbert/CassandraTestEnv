@@ -3,16 +3,6 @@ Cassandra-Test-Environment
 
 A simple vagrant-based Test-Environment of a 4-node-Cassandra-Cluster and a separate box for the Datastax OpsCenter.
 
-#Optional: Fetching Ressources
-
-First of all, we need a JDK (here: JDK 8) and Apache Cassandra. To fetch the ressources and persist them manually, use:
-```
-./bin/fetchRessources.sh
-```
-The ressource file will be saved in the repository. 
-
-This step is now optional. The Cassandra- and JDK-Packages will be fetched with the first vagrant provisioning (see next section).
-
 #Startup
 To initialize the vagrant boxes and startup the cassandra cluster:
 ```
@@ -52,7 +42,7 @@ To open the OPSCenter use a local browser:
 http://localhost:8888
 ```
 If you call the OPSCenter the first time, you'll have to configure the existing Cluster.
-Therefore choose 'manage an existing cluster' at the 1st dialog and use an IP of the cluster (i.e. 192.168.2.110).
+Therefore choose 'manage an existing cluster' at the 1st dialog and use an IP of the cluster (i.e. 192.168.2.110 and 192.168.2.120).
 After that you'll have to install the agents. (Use the 'fix' link at the top of the dashboard).
 The Credentials of the needed ssh-users are vagrant/vagrant.
 

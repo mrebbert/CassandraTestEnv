@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 CASSANDRA_USER="cassandra"
 CASSANDRA_HOME="/opt/cassandra"
 CASSANDRA_DATA_DIR="/var/lib/cassandra"
 CASSANDRA_LOG_DIR="/var/log/cassandra"
 CASSANDRA_VERSION="2.0.9"
-CASSANDRA_PKG=apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz
-CASSANDRA_URL=http://mirrors.koehn.com/apache/cassandra/${CASSANDRA_VERSION}/${CASSANDRA_PKG}
+CASSANDRA_PKG="apache-cassandra-${CASSANDRA_VERSION}-bin.tar.gz"
+CASSANDRA_URL="http://mirrors.koehn.com/apache/cassandra/${CASSANDRA_VERSION}/${CASSANDRA_PKG}"
 
 JAVA_HOME="/opt/java"
-JDK_PKG=jdk-8u20-linux-x64.tar.gz
-JDK_URL=http://download.oracle.com/otn-pub/java/jdk/8u20-b26/${JDK_PKG}
+JDK_PKG="jdk-8u20-linux-x64.tar.gz"
+JDK_URL="http://download.oracle.com/otn-pub/java/jdk/8u20-b26/${JDK_PKG}"
+
+PKG_DIR="${REPOSITORY_DIR}/pkg"
+MODULES_DIR="${REPOSITORY_DIR}/modules"
+CASSANDRA_MODULE_DIR="${MODULES_DIR}/cassandra"
+JDK_MODULE_DIR="${MODULES_DIR}/jdk"
 
 CURL=`which curl`
 
@@ -20,6 +23,12 @@ function checkCurl {
   if [ -z ${CURL} ] ; then
     echo "Please install curl and put it in your PATH."
     exit 3
+  fi
+}
+
+function createPackageDir {
+  if [ -e ${PKG_DIR} ] ; then
+    mkdir -p ${PKG_DIR}
   fi
 }
 
@@ -34,19 +43,19 @@ function initOpsCenter {
 
 function getJava {
   checkCurl
-  ${CURL} -o ${REPOSITORY_DIR}/${JDK_PKG} -b oraclelicense=accept-securebackup-cookie -O -L ${JDK_URL}
+  ${CURL} -o ${PKG_DIR}/${JDK_PKG} -b oraclelicense=accept-securebackup-cookie -O -L ${JDK_URL}
 }
 
 function getCassandra {
   checkCurl
-  ${CURL} -o ${REPOSITORY_DIR}/${CASSANDRA_PKG} ${CASSANDRA_URL}
+  ${CURL} -o ${PKG_DIR}/${CASSANDRA_PKG} ${CASSANDRA_URL}
 }
 
 function initJava {
-  sudo tar xvfz ${REPOSITORY_DIR}/${JDK_PKG} -C /opt/
+  sudo tar xvfz ${REPOSITORY_DIR}/pkg/${JDK_PKG} -C /opt/
   sudo ln -s /opt/jdk1.8.0_20 ${JAVA_HOME}
   sudo chown -R root. /opt/jdk1.8.0_20
-  sudo cp ${REPOSITORY_DIR}/java.sh /etc/profile.d/
+  sudo cp ${JDK_MODULE_DIR}/java.sh /etc/profile.d/
 
   sudo update-alternatives --install "/usr/bin/java" "java" "${JAVA_HOME}/bin/java" 1
   sudo update-alternatives --install "/usr/bin/javac" "javac" "${JAVA_HOME}/bin/javac" 1
@@ -59,19 +68,19 @@ function initJava {
 }
 
 function initCassandra {
-  sudo tar xvfz ${REPOSITORY_DIR}/${CASSANDRA_PKG} -C /opt/
+  sudo tar xvfz ${REPOSITORY_DIR}/pkg/${CASSANDRA_PKG} -C /opt/
   sudo ln -s /opt/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
   if [ ! -e /etc/init.d/cassandra ] ; then
-    sudo cp ${REPOSITORY_DIR}/init-cassandra /etc/init.d/cassandra
+    sudo cp ${CASSANDRA_MODULE_DIR}/init-cassandra /etc/init.d/cassandra
     sudo chown root. /etc/init.d/cassandra
     sudo chmod +x /etc/init.d/cassandra
   fi
 
-  sudo cp ${REPOSITORY_DIR}/cassandra.yaml ${CASSANDRA_HOME}/conf/
+  sudo cp ${CASSANDRA_MODULE_DIR}/cassandra.yaml ${CASSANDRA_HOME}/conf/
   sudo sed -i.bak -e "s/\${ip_addr}/${IP_ADDRESS}/g" ${CASSANDRA_HOME}/conf/cassandra.yaml
 
-  sudo cp ${REPOSITORY_DIR}/cassandra-rackdc.properties ${CASSANDRA_HOME}/conf/
+  sudo cp ${CASSANDRA_MODULE_DIR}/cassandra-rackdc.properties ${CASSANDRA_HOME}/conf/
   sudo sed -i.bak -e "s/\${datacenter}/${DATACENTER}/g" \
     ${CASSANDRA_HOME}/conf/cassandra-rackdc.properties
 
@@ -92,7 +101,7 @@ function initCassandra {
     sudo mkdir ${CASSANDRA_LOG_DIR}
     sudo chown ${CASSANDRA_USER}. ${CASSANDRA_LOG_DIR}
   fi
-  sudo cp ${REPOSITORY_DIR}/cassandra.sh /etc/profile.d/
+  sudo cp ${CASSANDRA_MODULE_DIR}/cassandra.sh /etc/profile.d/
 
   . /etc/profile
   sudo update-rc.d cassandra defaults

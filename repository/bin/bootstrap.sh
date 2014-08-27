@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 while getopts ":i:d:" opt; do
   case $opt in
     i)
@@ -26,7 +28,7 @@ fi
 
 REPOSITORY_DIR="/var/repository"
 
-. ${REPOSITORY_DIR}/functions.sh
+. ${REPOSITORY_DIR}/bin/functions.sh
 
 sudo sed -i 's/^mesg n$/tty -s \&\& mesg n/g' /root/.profile
 
@@ -45,14 +47,14 @@ fi
 
 if [ ! -e ${JAVA_HOME} ] ; then
 
-  if [ ! -e ${REPOSITORY_DIR}/${JDK_PKG} ] ; then
+  if [ ! -e ${PKG_DIR}/${JDK_PKG} ] ; then
     getJava
   fi
   initJava  
 fi
 
 if [ ! -e ${CASSANDRA_HOME} ] ; then
-  if [ ! -e ${REPOSITORY_DIR}/${CASSANDRA_PKG} ] ; then
+  if [ ! -e ${PKG_DIR}/${CASSANDRA_PKG} ] ; then
     getCassandra  
   fi
   initCassandra

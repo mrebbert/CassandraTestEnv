@@ -1,10 +1,10 @@
 #! /bin/bash
 
-REPOSITORY_DIR=$DIR/../repository
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-. $DIR/../repository/functions.sh
+. $DIR/functions.sh
 
-cd $REPOSITORY_DIR
+cd $PKG_DIR
 
 if [ ! -e ${CASSANDRA_PKG} ]; then
  getCassandra 

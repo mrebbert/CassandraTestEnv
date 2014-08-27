@@ -29,7 +29,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         vb.customize ["modifyvm", :id, "--memory", opts[:mem] ] if opts[:mem]
       end
       config.vm.provision "shell" do |s|
-        s.path= "../repository/bootstrap.sh"
+        s.path= "../repository/bin/bootstrap.sh"
         if opts[:name].to_s == "ops"
           s.args= ["-i", opts[:ip]]
         else 
