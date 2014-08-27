@@ -52,23 +52,26 @@ function getCassandra {
 }
 
 function initJava {
-  sudo tar xvfz ${REPOSITORY_DIR}/pkg/${JDK_PKG} -C /opt/
+  sudo tar xfz ${REPOSITORY_DIR}/pkg/${JDK_PKG} -C /opt/
   sudo ln -s /opt/jdk1.8.0_20 ${JAVA_HOME}
   sudo chown -R root. /opt/jdk1.8.0_20
   sudo cp ${JDK_MODULE_DIR}/java.sh /etc/profile.d/
 
-  sudo update-alternatives --install "/usr/bin/java" "java" "${JAVA_HOME}/bin/java" 1
-  sudo update-alternatives --install "/usr/bin/javac" "javac" "${JAVA_HOME}/bin/javac" 1
-  sudo update-alternatives --install "/usr/bin/javaws" "javaws" "${JAVA_HOME}/bin/javaws" 1
-  sudo update-alternatives --set java ${JAVA_HOME}/bin/java
-  sudo update-alternatives --set javac ${JAVA_HOME}/bin/javac
-  sudo update-alternatives --set javaws ${JAVA_HOME}/bin/javaws
+  sudo update-alternatives --install "/usr/bin/java" "java" \
+      "${JAVA_HOME}/bin/java" 1 >/dev/null
+  sudo update-alternatives --install "/usr/bin/javac" "javac" \
+      "${JAVA_HOME}/bin/javac" 1 >/dev/null 
+  sudo update-alternatives --install "/usr/bin/javaws" "javaws" \
+      "${JAVA_HOME}/bin/javaws" 1 >/dev/null
+  sudo update-alternatives --set java ${JAVA_HOME}/bin/java >/dev/null
+  sudo update-alternatives --set javac ${JAVA_HOME}/bin/javac >/dev/null
+  sudo update-alternatives --set javaws ${JAVA_HOME}/bin/javaws >/dev/null
 
   . /etc/profile
 }
 
 function initCassandra {
-  sudo tar xvfz ${REPOSITORY_DIR}/pkg/${CASSANDRA_PKG} -C /opt/
+  sudo tar xfz ${REPOSITORY_DIR}/pkg/${CASSANDRA_PKG} -C /opt/
   sudo ln -s /opt/apache-cassandra-${CASSANDRA_VERSION} ${CASSANDRA_HOME}
 
   if [ ! -e /etc/init.d/cassandra ] ; then
@@ -104,6 +107,6 @@ function initCassandra {
   sudo cp ${CASSANDRA_MODULE_DIR}/cassandra.sh /etc/profile.d/
 
   . /etc/profile
-  sudo update-rc.d cassandra defaults
-  sudo service cassandra restart
+  sudo update-rc.d cassandra defaults >/dev/null
+  sudo service cassandra restart >/dev/null
 }
