@@ -1,12 +1,15 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+NODE_MEM = 512
+BASE_PORT = 2210
+
 boxes = [
-  { :name => :ops,:ip => '192.168.2.100',:ssh_port => 2210,:cpus => 1, :mem => 256 },
-  { :name => :node1,:ip => '192.168.2.110',:datacenter => '1stDC',:ssh_port => 2211,:cpus => 1, :mem => 1024 },
-  { :name => :node2,:ip => '192.168.2.120',:datacenter => '2ndDC',:ssh_port => 2212,:cpus => 1, :mem => 1024 },
-  { :name => :node3,:ip => '192.168.2.130',:datacenter => '1stDC',:ssh_port => 2213,:cpus => 1, :mem => 1024 },
-  { :name => :node4,:ip => '192.168.2.140',:datacenter => '2ndDC',:ssh_port => 2214,:cpus => 1, :mem => 1024 },
+  { :name => :ops,:ip => '192.168.2.100',:ssh_port => BASE_PORT+4,:cpus => 1, :mem => 256 },
+  { :name => :node1,:ip => '192.168.2.110',:datacenter => '1stDC',:ssh_port => BASE_PORT+1,:cpus => 1, :mem => NODE_MEM },
+  { :name => :node2,:ip => '192.168.2.120',:datacenter => '2ndDC',:ssh_port => BASE_PORT+2,:cpus => 1, :mem => NODE_MEM },
+  { :name => :node3,:ip => '192.168.2.130',:datacenter => '1stDC',:ssh_port => BASE_PORT+3,:cpus => 1, :mem => NODE_MEM },
+  { :name => :node4,:ip => '192.168.2.140',:datacenter => '2ndDC',:ssh_port => BASE_PORT+4,:cpus => 1, :mem => NODE_MEM },
   ]
 
 VAGRANTFILE_API_VERSION = "2"
@@ -14,23 +17,28 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   boxes.each do |opts|
     config.vm.define opts[:name] do |config|
-      config.vm.box       = "ubuntu/trusty64"
-      config.vm.box_check_update = false
-      config.vm.network  "private_network", ip: opts[:ip]
-      config.vm.network  "forwarded_port", guest: 22, host: opts[:ssh_port]
+      config.vm.box               = "ubuntu/trusty64"
+      config.vm.box_check_update  = false
+
+      config.vm.network           "private_network", ip: opts[:ip]
+      config.vm.network           "forwarded_port", guest: 22, host: opts[:ssh_port]
+      
       if opts[:name].to_s == "ops"
-        config.vm.network  "forwarded_port", guest: 8888, host: 8888
+        config.vm.network         "forwarded_port", guest: 8888, host: 8888
       end
-      config.vm.hostname = "%s.vagrant" % opts[:name].to_s
-      config.vm.synced_folder "../repository", "/var/repository" 
-      config.ssh.forward_agent = true
+      
+      config.vm.hostname          = "%s.vagrant" % opts[:name].to_s
+      config.vm.synced_folder     "../repository", "/var/repository" 
+      config.ssh.forward_agent    = true
+      
       config.vm.provider "virtualbox" do |vb|
         # Use VBoxManage to customize the VM
         vb.customize ["modifyvm", :id, "--cpus", opts[:cpus] ] if opts[:cpus]
         vb.customize ["modifyvm", :id, "--memory", opts[:mem] ] if opts[:mem]
       end
+
       config.vm.provision "shell" do |s|
-        s.path= "../repository/bin/bootstrap.sh"
+        s.path = "../repository/bin/bootstrap.sh"
         if opts[:name].to_s == "ops"
           s.args= ["-i", opts[:ip]]
         else 
